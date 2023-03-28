@@ -1,0 +1,170 @@
+.app-title {
+    padding-top: 12px;
+}
+
+.main-container {
+}
+
+.form-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000AA;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.form {
+    padding: 16px;
+    border-radius: 16px;
+    background-color: white;
+}
+
+.form select {
+    min-width: 140px;
+}
+
+.form .title {
+    font-size: 18px;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+.form .location {
+    width: 60px;
+}
+
+.form .location::-webkit-inner-spin-button, 
+.form .location::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+}
+
+.form .actions {
+    margin-top: 12px;
+}
+.form .actions button {
+    margin-right: 12px;
+}
+
+.actions .action {
+    margin-top: 12px;
+}
+
+.display-options {
+    margin-top: 24px;
+    display: flex;
+}
+
+.display-options .label {
+    margin-right: 12px;
+}
+
+.display-table {
+    margin-top: 24px;
+}
+
+.display-table table {
+    margin-top: 12px;
+}
+
+.display-table table, .display-table th, .display-table td {
+}
+
+.table-data {
+    margin-left: 8px;
+    margin-right: 8px;
+}
+.table-data input{
+    width: 50px;
+}
+.table-data input::-webkit-inner-spin-button, 
+.table-data input::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+}
+
+th {
+    padding: 0 8px;
+}
+
+.item-container {
+    min-width: 50px;
+    text-align: center;
+}
+
+.item {
+    box-shadow: 0 0 4px 0 #DDD;
+    cursor: pointer;
+    padding: 12px 0;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.item.hidden {
+    background-color: white !important;
+}
+
+.show-on-hover:not(:hover) .location {
+    visibility: hidden;
+}
+.show-on-hover:not(:hover) .type-name {
+    display: none;
+}
+
+.item-container .active {
+    background-color: #00FF00aa;
+}
+
+.item-container .expired {
+    background-color: #ff0000aa;
+}
+
+.item-container .week-expired {
+    background-color: #ff5349aa;
+}
+
+.item-container .month-expired {
+    background-color: #ffff00aa;
+}
+
+.item-container .not-available {
+    background-color: gray;
+}
+.item-container .not-available * {
+    display: none;
+}
+
+.details-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000AA;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.details {
+    border-radius: 8px;
+    background-color: white;
+    padding: 16px;
+    text-align: center;
+}
+
+.details .info-item {
+    margin-bottom: 8px;
+}
+
+.list {
+    margin-top: 12px;
+}
+
+.list .list-item {
+    cursor: pointer;
+    margin-bottom: 8px;
+}
