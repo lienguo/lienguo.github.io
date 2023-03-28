@@ -6,162 +6,179 @@
     <link rel="stylesheet" type="text/css" href="index.css">
 </head>
 
-<div id="app">
-    <h2 class="app-title">Buddha Offering Management</h2>
-    <div v-if="isLoading">Loading ...</div>
-    <div class="main-container">
+<body>
 
-        <!-- Form -->
-        <div class="form-container" v-if="newItem">
-            <div class="form">
-                <div class="title">Create Offering Record</div>
-                <table>
-                    <tr>
-                        <td>Location</td>
-                        <td>
-                            {{newItem.section}} - {{newItem.row}}{{newItem.column}}
-                            <!-- <select v-model="newItem.section">
+    <div id="app">
+        <h2 class="app-title">Buddha Offering Management</h2>
+        <!-- Export and load data -->
+        <div class="load-actions" v-if="!isImporting">
+            <button type="button" @click="exportData">Export Data</button>
+            <button type="button" @click="isImporting = true">Import Data</button>
+        </div>
+
+        <div v-if="isImporting">
+            <textarea v-model="loadJson" name="" id="" cols="80" rows="20"></textarea>
+            <div class="actions">
+                <button @click="loadData">Load Data</button>
+                <button @click="isImporting = false">Cancel</button>
+            </div>
+        </div>
+
+        <div v-if="isLoadingOffering || isLoadingSection">Loading ...</div>
+        <div class="main-container">
+
+            <!-- Edit Items Modal -->
+            <div class="form-container" v-if="newItem">
+                <div class="form">
+                    <div class="title">Create Offering Record</div>
+                    <table>
+                        <tr>
+                            <td>Location</td>
+                            <td>
+                                {{newItem.section}} - {{newItem.row}}{{newItem.column}}
+                                <!-- <select v-model="newItem.section">
                                 <option disabled value=""></option>
                                 <option>L1</option>
                                 <option>R1</option>
                             </select> -->
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Type</td>
-                        <td>
-                            <select v-model="newItem.type">
-                                <option disabled value=""></option>
-                                <option>藥師佛</option>
-                                <option>黃財神</option>
-                                <option>黃財神（荷葉）</option>
-                                <option>財寶天王</option>
-                                <option>四臂觀音</option>
-                                <option>文殊菩薩</option>
-                                <option>長壽佛</option>
-                                <option>白度母</option>
-                                <option>綠度母</option>
-                                <option>蓮花生大士</option>
-                                <option>阿彌陀佛</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Start Date</td>
-                        <td>
-                            <input v-model="newItem.startDate" type="date" id="startDate">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Expiration Date</td>
-                        <td>
-                            <input v-model="newItem.endDate" type="date" id="endDate">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Name</td>
-                        <td>
-                            <input v-model="newItem.name" type="text" id="name">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Contact Name</td>
-                        <td>
-                            <input v-model="newItem.contactName" type="text" id="contactName">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Phone Number</td>
-                        <td>
-                            <input v-model="newItem.phone" type="text" id="contact">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Price</td>
-                        <td>
-                            <input v-model="newItem.price" type="text" id="price">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Location</td>
-                        <td>
-                            <select v-model="newItem.notAvailable">
-                                <option value="false">Available</option>
-                                <option value="true">Not Available</option>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-                <div class="actions">
-                    <button type="button" @click="submit">Save Item</button>
-                    <button type="button" @click="clearData">Clear</button>
-                    <button type="button" @click="cancelCreate">Cancel</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Searchbar -->
-        <div class="actions">
-            <div class="action">
-                Search name: <input type="text" v-model="query"> <button @click="query=''">Clear</button>
-            </div>
-        </div>
-
-        <!-- Search results -->
-        <div class="list" v-if="query">
-            <div v-for="item in allData?.items">
-                <div class="list-item" @click="selectItem(item.section, item.row, item.column)"
-                    v-if="(item?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item?.contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1)">
-                    {{item.section}}-{{item.row}}{{item.column}} <b>{{item.name}}</b> {{item.contactName}} {{item.type}}
-                    {{item.startDate}}
-                    {{item.endDate}}
-                </div>
-            </div>
-        </div>
-
-        <div v-for="(value, propertyName) in allData.sectionData">
-            <div v-if="propertyName !== 'id'">
-
-                <div v-if="allData.sectionData[propertyName]">
-                    <div class="display-options">
-
-                        <div class="label">Section {{propertyName}}</div>
-                        <div class="table-data">
-                            # Rows:&#8615;: <input type="number" v-model="allData.sectionData[propertyName].numRows">
-                        </div>
-                        <div class="table-data">
-                            # Columns &#8614;: <input type="number"
-                                v-model="allData.sectionData[propertyName].numColumns">
-                        </div>
-                        <button @click="saveSectionData">Save</button>
-                    </div>
-                    <div v-if="allData.sectionData[propertyName]">
-                        {{allData.sectionData[propertyName].description}}
-                    </div>
-                </div>
-                <div class="display-table" v-if="allData?.sectionData[propertyName]">
-                    <table>
-                        <tr>
-                            <th></th>
-                            <th v-for="indexC in allData.sectionData[propertyName].numColumns">
-                                {{indexC}}
-                            </th>
+                            </td>
                         </tr>
-                        <tr v-for="indexR in allData?.sectionData[propertyName].numRows" :key="indexR">
-                            <th>
-                                {{this.alphabetMap[indexR - 1]}}
-                            </th>
-                            <td class="item-container show-on-hover"
-                                v-for="indexC in allData.sectionData[propertyName].numColumns" :key="indexC"
-                                @click="selectItem(propertyName, this.alphabetMap[indexR - 1], indexC)">
-                                <div class="item"
-                                    v-if="!(parsedItemData && parsedItemData[propertyName] && parsedItemData[propertyName][indexR - 1] && parsedItemData[propertyName][indexR - 1][indexC - 1])">
-                                    <div class="location">
-                                        {{this.alphabetMap[indexR - 1]}}{{indexC}}
+                        <tr>
+                            <td>Type</td>
+                            <td>
+                                <select v-model="newItem.type">
+                                    <option disabled value=""></option>
+                                    <option>藥師佛</option>
+                                    <option>黃財神</option>
+                                    <option>黃財神（荷葉）</option>
+                                    <option>財寶天王</option>
+                                    <option>四臂觀音</option>
+                                    <option>文殊菩薩</option>
+                                    <option>長壽佛</option>
+                                    <option>白度母</option>
+                                    <option>綠度母</option>
+                                    <option>蓮花生大士</option>
+                                    <option>阿彌陀佛</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Start Date</td>
+                            <td>
+                                <input v-model="newItem.startDate" type="date" id="startDate">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Expiration Date</td>
+                            <td>
+                                <input v-model="newItem.endDate" type="date" id="endDate">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td>
+                                <input v-model="newItem.name" type="text" id="name">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Contact Name</td>
+                            <td>
+                                <input v-model="newItem.contactName" type="text" id="contactName">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Phone Number</td>
+                            <td>
+                                <input v-model="newItem.phone" type="text" id="contact">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Price</td>
+                            <td>
+                                <input v-model="newItem.price" type="text" id="price">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Location</td>
+                            <td>
+                                <select v-model="newItem.notAvailable">
+                                    <option value="false">Available</option>
+                                    <option value="true">Not Available</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="actions">
+                        <button type="button" @click="submit">Save Item</button>
+                        <button type="button" @click="clearData">Clear</button>
+                        <button type="button" @click="cancelCreate">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Searchbar -->
+            <div class="actions">
+                <div class="action">
+                    Search name: <input type="text" v-model="query"> <button @click="query=''">Clear</button>
+                </div>
+            </div>
+
+            <!-- Search results -->
+            <div class="list" v-if="query">
+                <div v-for="item in allData?.items">
+                    <div class="list-item" @click="selectItem(item.section, item.row, item.column)"
+                        v-if="(item?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item?.contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1)">
+                        {{item.section}}-{{item.row}}{{item.column}} <b>{{item.name}}</b> {{item.contactName}}
+                        {{item.type}}
+                        {{item.startDate}}
+                        {{item.endDate}}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div v-for="(value, propertyName) in allData.sectionData">
+                <div v-if="propertyName !== 'id'">
+                    <div v-if="allData.sectionData[propertyName]">
+                        <div class="display-options">
+                            <div class="label">Section {{propertyName}}</div>
+                            <div class="table-data">
+                                # Rows &#8615;: <input type="number"
+                                    v-model="allData.sectionData[propertyName].numRows">
+                            </div>
+                            <div class="table-data">
+                                # Columns &#8614;: <input type="number"
+                                    v-model="allData.sectionData[propertyName].numColumns">
+                            </div>
+                            <button @click="saveSectionData">Save</button>
+                        </div>
+                        <div class="section-description" v-if="allData.sectionData[propertyName]">
+                            {{allData.sectionData[propertyName].description}}
+                        </div>
+                    </div>
+                    <div class="display-table" v-if="allData?.sectionData[propertyName]">
+                        <table>
+                            <tr>
+                                <th></th>
+                                <th v-for="indexC in allData.sectionData[propertyName].numColumns">
+                                    {{indexC}}
+                                </th>
+                            </tr>
+                            <tr v-for="indexR in allData?.sectionData[propertyName].numRows" :key="indexR">
+                                <th>
+                                    {{this.alphabetMap[indexR - 1]}}
+                                </th>
+                                <td class="item-container show-on-hover"
+                                    v-for="indexC in allData.sectionData[propertyName].numColumns" :key="indexC"
+                                    @click="selectItem(propertyName, this.alphabetMap[indexR - 1], indexC)">
+                                    <div class="item"
+                                        v-if="!(parsedItemData && parsedItemData[propertyName] && parsedItemData[propertyName][indexR - 1] && parsedItemData[propertyName][indexR - 1][indexC - 1])">
+                                        <div class="location">
+                                            {{this.alphabetMap[indexR - 1]}}{{indexC}}
+                                        </div>
                                     </div>
-                                </div>
-                                <div v-else class="item"
-                                    :class="{
+                                    <div v-else class="item"
+                                        :class="{
                                             'not-available': parsedItemData[propertyName][indexR - 1][indexC - 1].notAvailable,
                                             active: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 2, 
                                             expired: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === -1, 
@@ -169,274 +186,306 @@
                                             'month-expired': (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 1, 
                                             'hidden': query && !((parsedItemData[propertyName][indexR - 1][indexC - 1].name?.toLowerCase().indexOf(query.toLowerCase())  !== -1 || 
                                             parsedItemData[propertyName][indexR - 1][indexC - 1].contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1))}">
-                                    <div class="location">
-                                        {{this.alphabetMap[indexR - 1]}}{{indexC}}
+                                        <div class="location">
+                                            {{this.alphabetMap[indexR - 1]}}{{indexC}}
+                                        </div>
+                                        <div class="offering-details">
+                                            <!-- <div>
+                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].name}}
+                                            </div>
+                                            <div>
+                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
+                                            </div>
+                                            <div>
+                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
+                                            </div>
+                                            <div>
+                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
+                                            </div> -->
+                                        </div>
                                     </div>
-                                    <div class="type-name">
-                                        {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="details-modal" v-if="selectedItem">
-            <div class="details">
-                <div class="info-item">
-                    {{selectedItem.section}} - {{selectedItem.row}}{{selectedItem.column}}
-                </div>
-                <div class="info-item">
-                    {{selectedItem.name}}
-                    {{selectedItem.contactName}}
-                </div>
-                <div class="info-item">
-                    {{selectedStartDate}} -
-                    {{selectedEndDate}}
-                </div>
-                <div class="info-item">
-                    {{selectedItem.type}} - ${{selectedItem.price}}
-                </div>
-                <div class="info-item">
-                    {{selectedItem.phone}}
-                </div>
-                <div class="actions">
-                    <button type="button" @click="selectedItem = null"> Close </button>
-                    <button type="button" @click="editItem()"> Edit
-                    </button>
+            <!-- Details Modal -->
+            <div class="details-modal" v-if="selectedItem">
+                <div class="details">
+                    <div class="info-item">
+                        {{selectedItem.section}} - {{selectedItem.row}}{{selectedItem.column}}
+                    </div>
+                    <div class="info-item">
+                        {{selectedItem.name}}
+                        {{selectedItem.contactName}}
+                    </div>
+                    <div class="info-item">
+                        {{selectedStartDate}} -
+                        {{selectedEndDate}}
+                    </div>
+                    <div class="info-item">
+                        {{selectedItem.type}} - ${{selectedItem.price}}
+                    </div>
+                    <div class="info-item">
+                        {{selectedItem.phone}}
+                    </div>
+                    <div class="actions">
+                        <button type="button" @click="selectedItem = null"> Close </button>
+                        <button type="button" @click="editItem()"> Edit
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script type="module">
+    <script type="module">
 
-    let vm;
-    let alphabetMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-        'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+        let vm;
+        let alphabetMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-    let parsedItemData = {};
+        let parsedItemData = {};
 
-    function parseData(itemArr) {
-        parsedItemData = {};
-        if (!itemArr?.length) {
-            return;
-        }
-        itemArr.forEach(item => {
-            parsedItemData[item.section] = parsedItemData[item.section] || [];
-            parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())] = parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())] || [];
-            parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())][item.column - 1] = item;
-
-            let timeDifference = (new Date(item.endDate).getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000);
-            if (timeDifference < 0) {
-                item.status = -1;
-            } else if (timeDifference < 7) {
-                item.status = 0;
-            } else if (timeDifference < 30) {
-                item.status = 1;
-            } else {
-                item.status = 2;
+        function parseData(itemArr) {
+            parsedItemData = {};
+            if (!itemArr?.length) {
+                return;
             }
-        })
-        return parsedItemData;
-    }
+            itemArr.forEach(item => {
+                parsedItemData[item.section] = parsedItemData[item.section] || [];
+                parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())] = parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())] || [];
+                parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())][item.column - 1] = item;
 
-    function createNewItem(section, row, column) {
-        return {
-            fullPosition: section + '-' + row + '-' + column,
-            section,
-            row,
-            column,
-            price: 0,
-            phone: '',
-            type: '',
-            startDate: moment().format('yyyy-MM-DD'),
-            endDate: moment().add(1, 'years').format('yyyy-MM-DD'),
-            name: '',
-            contactName: '',
-            status: 2,
-            notAvailable: false
+                let timeDifference = (new Date(item.endDate).getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000);
+                if (timeDifference < 0) {
+                    item.status = -1;
+                } else if (timeDifference < 7) {
+                    item.status = 0;
+                } else if (timeDifference < 30) {
+                    item.status = 1;
+                } else {
+                    item.status = 2;
+                }
+            })
+            return parsedItemData;
         }
-    }
 
-    vm = Vue.createApp({
-        data() {
-            this.allData = {
-                items: [],
-                sectionData: {
-                    id: 1,
-                    L1: {
-                        numRows: 11,
-                        numColumns: 38,
-                        description: 'Facing the alter, on the left'
-                    },
-                    R1: {
-                        numRows: 11,
-                        numColumns: 32,
-                        description: 'Facing the alter, on the right'
-                    }
-                }
-            };
-
-            let offeringObjectStore;
-            let sectionInfoObjectStore;
-
-            let dbAttempted = false;
-
-            // Set up databse
-            const setupDb = () => {
-                if (dbAttempted) {
-                    return;
-                }
-                this.isLoading = true;
-
-                const request = window.indexedDB.open('TempleData', 1);
-                request.onerror = (event) => {
-                    console.log('error', event);
-                    this.isLoading = false;
-                };
-                request.onsuccess = (event) => {
-                    console.log('db found');
-                    let db = event.target.result;
-                    offeringObjectStore = db
-                        .transaction("offerings", "readwrite")
-                        .objectStore("offerings");
-
-                    sectionInfoObjectStore = db
-                        .transaction("sectionData", "readwrite")
-                        .objectStore("sectionData");
-
-                    const sectionRequest = sectionInfoObjectStore.get(this.allData.sectionData.id);
-                    sectionRequest.onsuccess = () => {
-                        console.log('retrieving', sectionRequest.result);
-
-                        if (!sectionRequest?.result) {
-                            console.log('attempting to save');
-                            const sectionRequest = sectionInfoObjectStore.add(this.allData.sectionData);
+        vm = Vue.createApp({
+            data() {
+                this.allData = {
+                    items: [],
+                    sectionData: {
+                        id: 1,
+                        L1: {
+                            numRows: 11,
+                            numColumns: 38,
+                            description: 'Facing the alter, on the left'
+                        },
+                        R1: {
+                            numRows: 11,
+                            numColumns: 32,
+                            description: 'Facing the alter, on the right'
                         }
-                        this.isLoading = false;
                     }
-
                 };
 
-                // This event is only implemented in recent browsers
-                request.onupgradeneeded = (event) => {
-                    console.log('db upgraded')
-                    let db = event.target.result;
-                    db.createObjectStore("offerings", { keyPath: "fullPosition" });
-                    db.createObjectStore("sectionData", { keyPath: "id" });
-                };
-            }
-            setupDb();
+                let dbAttempted = false;
 
-            return {
-                offeringObjectStore,
-                sectionInfoObjectStore,
-                query: '',
-                alphabetMap,
-                isLoading: false,
-                newItem: null,
-                selectedItem: null,
-                parsedItemData: null,
-                filteredList: []
-            }
-        },
-        computed: {
-            selectedStartDate() {
-                if (this.selectedItem) {
-                    return moment(this.selectedItem.startDate).format('MM/DD/yyyy');
-                }
-            },
-            selectedEndDate() {
-                if (this.selectedItem) {
-                    return moment(this.selectedItem.endDate).format('MM/DD/yyyy');
-                }
-            }
-        },
-        methods: {
-            saveSectionData() {
-                // Edit existing section data in chart
-            },
-            clearData() {
-                if (this.newItem) {
-                    this.newItem = JSON.parse(JSON.stringify(createNewItem(this.newItem.section, this.newItem.row, this.newItem.column)));
-                }
-            },
-            submit() {
-                if (!this.newItem) {
-                    return;
-                }
-
-                let foundItem = this.allData.items.find(item => item.fullPosition === this.newItem.fullPosition);
-
-                this.newItem.name = this.newItem.name || this.newItem.contactName;
-                this.newItem.contactName = this.newItem.contactName || this.newItem.name;
-
-                if (foundItem) {
-                    for (key in Object.keys(this.newItem)) {
-                        foundItem[key] = this.newItem[key];
+                // Set up databse
+                const setupDb = () => {
+                    if (dbAttempted) {
+                        return;
                     }
-                } else {
-                    this.allData.items.push(this.newItem);
+                    this.isLoadingSection = true;
+                    this.isLoadingOffering = true;
+
+                    const request = window.indexedDB.open('TempleData', 1);
+                    request.onerror = (event) => {
+                        console.log('error', event);
+                        this.isLoadingSection = false;
+                        this.isLoadingOffering = false;
+                    };
+                    request.onsuccess = (event) => {
+                        console.log('db found');
+                        this.db = event.target.result;
+
+                        const sectionRequest = this.db
+                            .transaction("sectionData", "readwrite")
+                            .objectStore("sectionData").get(this.allData.sectionData.id);
+                        sectionRequest.onsuccess = () => {
+                            console.log('retrieving', sectionRequest.result);
+
+                            if (!sectionRequest?.result) {
+                                console.log(11, 'no section data in db, attempting to save');
+                                const sectionRequest = sectionInfoObjectStore.add(this.allData.sectionData);
+                            } else {
+                                console.log(12, 'section data found in db')
+                                this.allData.sectionData = sectionRequest.result;
+                            }
+                            this.isLoadingSection = false;
+                        }
+                        sectionRequest.onerror = () => {
+                            console.log(13, 'error trying to get section data')
+                            this.isLoadingSection = false;
+                        }
+
+                        const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").getAll();
+                        offeringRequest.onsuccess = () => {
+                            if (offeringRequest.result?.length) {
+                                console.log(21, 'offering data found in db');
+                                this.allData.items = offeringRequest.result;
+                                this.parsedItemData = parseData(this.allData.items);
+
+                                console.log(this.allData);
+                            } else {
+                                console.log(22, 'no offering data in db')
+                            }
+                            this.isLoadingOffering = false;
+                        }
+                        offeringRequest.onerror = () => {
+                            console.log(33, 'error trying to get offering')
+                            this.isLoadingOffering = false;
+                        }
+                    };
+
+                    // This event is only implemented in recent browsers
+                    request.onupgradeneeded = (event) => {
+                        console.log('db upgraded')
+                        this.db = event.target.result;
+                        this.db.createObjectStore("offerings", { keyPath: "fullPosition" });
+                        this.db.createObjectStore("sectionData", { keyPath: "id" });
+                    };
                 }
+                setupDb();
 
-                this.newItem = null;
-
-                this.parsedItemData = parseData(this.allData.items);
-                if (vm) {
-                    vm.$forceUpdate();
+                return {
+                    db: null,
+                    query: '',
+                    alphabetMap,
+                    isLoadingOffering: false,
+                    isLoadingSection: false,
+                    isImporting: false,
+                    newItem: null,
+                    selectedItem: null,
+                    parsedItemData: null,
+                    filteredList: [],
+                    loadJson: null
                 }
             },
-            selectItem(section, row, column) {
-                let foundItem = this.allData.items.find(origItem => origItem.section === section &&
-                    origItem.row === row && origItem.column === column);
-
-                if (foundItem) {
-                    this.selectedItem = foundItem;
-                } else {
-                    this.newItem = JSON.parse(JSON.stringify(createNewItem(section, row, column)));
-                    console.log(this.newItem)
-                }
-            },
-            editItem() {
-                if (this.selectedItem) {
-                    this.newItem = JSON.parse(JSON.stringify(createNewItem(this.selectedItem.section, this.selectedItem.row, this.selectedItem.column)));
-                    for (let key in Object.keys(this.selectedItem)) {
-                        this.newItem[key] = this.selectedItem[key];
-                        console.log(key, this.selectedItem[key])
+            computed: {
+                selectedStartDate() {
+                    if (this.selectedItem) {
+                        return moment(this.selectedItem.startDate).format('MM/DD/yyyy');
+                    }
+                },
+                selectedEndDate() {
+                    if (this.selectedItem) {
+                        return moment(this.selectedItem.endDate).format('MM/DD/yyyy');
                     }
                 }
             },
-            delete(item) {
-                let index = this.allData.findIndex(origItem => origItem.section === item.section &&
-                    origItem.row === item.row && origItem.column === item.column);
-                if (index !== -1) {
-                    this.allData.items.splice(index, 1);
+            methods: {
+                createNewItem(section, row, column, type = '') {
+                    return {
+                        fullPosition: section + '-' + row + '-' + column,
+                        section,
+                        row,
+                        column,
+                        price: 0,
+                        phone: '',
+                        type: type,
+                        startDate: moment().format('yyyy-MM-DD'),
+                        endDate: moment().add(1, 'years').format('yyyy-MM-DD'),
+                        name: '',
+                        contactName: '',
+                        status: 2,
+                        notAvailable: false
+                    }
+                },
+                saveSectionData() {
+                    // Edit existing section data in chart
+                },
+                clearData() {
+                    if (this.newItem) {
+                        this.newItem = this.createNewItem(this.newItem.section, this.newItem.row, this.newItem.column, this.newItem.type);
+                    }
+                },
+                submit() {
+                    if (!this.newItem) {
+                        return;
+                    }
+
+                    let foundItem = this.allData.items.find(item => item.fullPosition === this.newItem.fullPosition);
+
+                    this.newItem.name = this.newItem.name || this.newItem.contactName;
+                    this.newItem.contactName = this.newItem.contactName || this.newItem.name;
+
+                    if (foundItem) {
+                        for (let key in this.newItem) {
+                            foundItem[key] = this.newItem[key];
+                        }
+                        const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").put({ ...foundItem });
+                    } else {
+                        this.allData.items.push(this.newItem);
+                        const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").add({ ...this.newItem });
+                    }
+
+                    this.newItem = null;
+
+                    this.parsedItemData = parseData(this.allData.items);
+                    if (vm) {
+                        vm.$forceUpdate();
+                    }
+                },
+                selectItem(section, row, column) {
+                    let foundItem = this.allData.items.find(origItem => origItem.section === section &&
+                        origItem.row === row && origItem.column === column);
+
+                    if (foundItem) {
+                        this.newItem = this.createNewItem(foundItem.section, foundItem.row, foundItem.column);
+                        for (let key in foundItem) {
+                            this.newItem[key] = foundItem[key];
+                        }
+                    } else {
+                        this.newItem = this.createNewItem(section, row, column);
+                    }
+                },
+                delete(item) {
+                    let index = this.allData.findIndex(origItem => origItem.section === item.section &&
+                        origItem.row === item.row && origItem.column === item.column);
+                    if (index !== -1) {
+                        this.allData.items.splice(index, 1);
+                    }
+                },
+                exportData() {
+                    var a = document.createElement("a");
+                    var file = new Blob([JSON.stringify(this.allData)], { type: 'application/json' });
+                    a.href = URL.createObjectURL(file);
+                    a.download = 'data';
+                    a.click();
+                },
+                loadData() {
+                    if (this.loadJson) {
+                        this.allData = JSON.parse(this.loadJson);
+                        this.parsedItemData = parseData(this.allData.items);
+                    }
+                    this.isImporting = false;
+                },
+                deleteData() {
+                    this.db.deleteData()
+                },
+                cancelCreate() {
+                    this.newItem = null;
                 }
-            },
-            download() {
-                var a = document.createElement("a");
-                var file = new Blob([JSON.stringify(this.allData)], { type: 'application/json' });
-                a.href = URL.createObjectURL(file);
-                a.download = 'data';
-                a.click();
-            },
-            loadData() {
-                // Load data from pasted json
-            },
-            deleteData() {
-                this.db.deleteData()
-            },
-            cancelCreate() {
-                this.newItem = null;
             }
-        }
-    }).mount('#app');
+        }).mount('#app');
 
 
-</script>
+    </script>
+
+</body>
 
 </html>

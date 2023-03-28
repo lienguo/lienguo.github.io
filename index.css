@@ -1,3 +1,7 @@
+body {
+    font-family: Helvetica, Arial, Sans-Serif;
+}
+
 .app-title {
     padding-top: 12px;
 }
@@ -54,6 +58,10 @@
     margin-top: 12px;
 }
 
+.section-description {
+    margin-top: 12px;
+}
+
 .display-options {
     margin-top: 24px;
     display: flex;
@@ -64,11 +72,14 @@
 }
 
 .display-table {
-    margin-top: 24px;
+    margin: 12px 0 36px;
 }
 
 .display-table table {
-    margin-top: 12px;
+}
+
+.section-container {
+    margin-bottom: 20px;
 }
 
 .display-table table, .display-table th, .display-table td {
@@ -87,7 +98,7 @@
 }
 
 th {
-    padding: 0 8px;
+    padding: 8px 16px;
 }
 
 .item-container {
@@ -107,11 +118,21 @@ th {
     background-color: white !important;
 }
 
-.show-on-hover:not(:hover) .location {
+/* .show-on-hover:not(:hover) .location {
     visibility: hidden;
+} */
+
+.location {
+    color: #777;
+    font-size: 14px;
 }
-.show-on-hover:not(:hover) .type-name {
+
+.show-on-hover:not(:hover) .offering-details {
     display: none;
+}
+
+.offering-details * {
+    white-space: nowrap;
 }
 
 .item-container .active {
