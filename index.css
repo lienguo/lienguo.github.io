@@ -23,6 +23,7 @@ button {
 }
 
 input, select {
+    padding-left: 12px;
     height: 30px;
     border: 2px solid var(--main-color);
     border-radius: 4px;
@@ -53,6 +54,7 @@ input, select {
     padding: 16px;
     border-radius: 8px;
     background-color: #F1F1F1;
+    margin-bottom: 36px;
 }
 
 
@@ -78,8 +80,14 @@ input, select {
     margin-bottom: 8px;
 }
 
+
+.list .list-item:hover{
+    background-color: #FFF;
+}
+
 .list .list-item td {
-    padding: 0 8px;
+    padding: 2px 8px;
+    border-collapse: collapse;
 }
 
 .list .list-item.active .list-details {
@@ -144,6 +152,10 @@ input, select {
     margin-top: 12px;
 }
 
+.form td.danger {
+    color: red;
+}
+
 .section-description .edit {
     margin-left: 16px;
     color: var(--main-color);
@@ -152,6 +164,7 @@ input, select {
 
 .display-options {
     margin-top: 24px;
+    margin-bottom: 16px;
     display: flex;
 }
 
@@ -194,11 +207,11 @@ input, select {
 }
 
 th.column-header {
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
 th.row-header {
-    padding-right: 16px;
+    padding-right: 12px;
 }
 
 .item-container {
@@ -255,11 +268,10 @@ th.row-header {
     background-color: #ffff00aa;
 }
 
-.item-container .not-available {
-    background-color: gray;
+.item-container.not-available {
 }
-.item-container .not-available * {
-    display: none;
+.item-container.not-available * {
+    visibility: hidden;
 }
 
 .details-modal {

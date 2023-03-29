@@ -10,7 +10,6 @@
     <div id="app">
         <div class="menu">
             <div class="app-title">Buddha Offering Management</div>
-
             <!-- Export and load data -->
             <div class="load-actions" v-if="!isImporting">
                 <button type="button" @click="exportData">Export Data</button>
@@ -18,8 +17,7 @@
             </div>
         </div>
         <div v-if="isLoadingOffering || isLoadingSection">Loading ...</div>
-        <div class="main-container">
-
+        <div class="main-container" v-if="!(isLoadingOffering || isLoadingSection)">
             <div v-if="isImporting">
                 <textarea v-model="loadJson" name="" id="" cols="80" rows="20"></textarea>
                 <div class="actions">
@@ -29,7 +27,6 @@
             </div>
 
             <template v-if="!isImporting">
-
                 <!-- Edit Items Modal -->
                 <div class="form-container" v-if="newItem">
                     <div class="form">
@@ -39,11 +36,6 @@
                                 <td>Location</td>
                                 <td>
                                     {{newItem.section}} - {{newItem.row}}{{newItem.column}}
-                                    <!-- <select v-model="newItem.section">
-                                <option disabled value=""></option>
-                                <option>L1</option>
-                                <option>R1</option>
-                            </select> -->
                                 </td>
                             </tr>
                             <tr>
@@ -102,10 +94,10 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>Location</td>
+                                <td :class="{danger: newItem.notAvailable}">Location</td>
                                 <td>
                                     <select v-model="newItem.notAvailable">
-                                        <option value="false">Available</option>
+                                        <option value="">Available</option>
                                         <option value="true">Not Available</option>
                                     </select>
                                 </td>
@@ -152,6 +144,12 @@
                             </tr>
                         </template>
                     </table>
+                    <div class="list"
+                        v-if="query && !allData?.items.find(item => (item?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item?.contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1))">
+                        <i>
+                            No results found
+                        </i>
+                    </div>
                 </div>
 
                 <!-- Table -->
@@ -194,7 +192,9 @@
                                     <th class="row-header">
                                         {{this.alphabetMap[indexR - 1]}}
                                     </th>
-                                    <td class="item-container show-on-hover"
+                                    <td class="item-container show-on-hover" :class="{'not-available': parsedItemData && parsedItemData[propertyName] && parsedItemData[propertyName][indexR - 1] &&
+                                    parsedItemData[propertyName][indexR - 1][indexC - 1]&&
+                                    parsedItemData[propertyName][indexR - 1][indexC - 1].notAvailable}"
                                         v-for="indexC in allData.sectionData[propertyName].numColumns" :key="indexC"
                                         @click="selectItem(propertyName, this.alphabetMap[indexR - 1], indexC)">
                                         <div class="item"
@@ -205,7 +205,6 @@
                                         </div>
                                         <div v-else class="item"
                                             :class="{
-                                            'not-available': parsedItemData[propertyName][indexR - 1][indexC - 1].notAvailable,
                                             active: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 2, 
                                             expired: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === -1, 
                                             'week-expired': (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 0, 
@@ -435,7 +434,9 @@
                 },
                 saveSectionData() {
                     // Edit existing section data in chart
-                    const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").put(this.allData.sectionData);
+                    let sectionData = this.allData.sectionData;
+                    console.log('section', sectionData)
+                    const offeringRequest = this.db.transaction("sectionData", "readwrite").objectStore("sectionData").put({ ...this.allData.sectionData });
                     this.edittingSection = null;
                 },
                 clearData() {
