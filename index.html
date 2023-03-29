@@ -169,14 +169,15 @@
                                         # Columns &#8614; <input type="number"
                                             v-model="allData.sectionData[propertyName].numColumns">
                                     </div>
-                                    <div>
-                                        Description <input type="number"
+                                    <div class="table-long-data">
+                                        Description <input type="text"
                                             v-model="allData.sectionData[propertyName].description">
                                     </div>
                                     <button @click="saveSectionData">Save</button>
                                 </template>
                                 <div class="section-description" v-if="edittingSection !== propertyName">
                                     {{allData.sectionData[propertyName].description}}
+                                    <span class="edit" @click="edittingSection = propertyName">Edit</span>
                                 </div>
                             </div>
                         </div>
@@ -380,7 +381,6 @@
 
                     // This event is only implemented in recent browsers
                     request.onupgradeneeded = (event) => {
-                        console.log('db upgraded')
                         this.db = event.target.result;
                         this.db.createObjectStore("offerings", { keyPath: "fullPosition" });
                         this.db.createObjectStore("sectionData", { keyPath: "id" });
