@@ -7,178 +7,203 @@
 </head>
 
 <body>
-
     <div id="app">
-        <h2 class="app-title">Buddha Offering Management</h2>
-        <!-- Export and load data -->
-        <div class="load-actions" v-if="!isImporting">
-            <button type="button" @click="exportData">Export Data</button>
-            <button type="button" @click="isImporting = true">Import Data</button>
-        </div>
+        <div class="menu">
+            <div class="app-title">Buddha Offering Management</div>
 
-        <div v-if="isImporting">
-            <textarea v-model="loadJson" name="" id="" cols="80" rows="20"></textarea>
-            <div class="actions">
-                <button @click="loadData">Load Data</button>
-                <button @click="isImporting = false">Cancel</button>
+            <!-- Export and load data -->
+            <div class="load-actions" v-if="!isImporting">
+                <button type="button" @click="exportData">Export Data</button>
+                <button type="button" @click="isImporting = true">Import Data</button>
             </div>
         </div>
-
         <div v-if="isLoadingOffering || isLoadingSection">Loading ...</div>
         <div class="main-container">
 
-            <!-- Edit Items Modal -->
-            <div class="form-container" v-if="newItem">
-                <div class="form">
-                    <div class="title">Create Offering Record</div>
-                    <table>
-                        <tr>
-                            <td>Location</td>
-                            <td>
-                                {{newItem.section}} - {{newItem.row}}{{newItem.column}}
-                                <!-- <select v-model="newItem.section">
+            <div v-if="isImporting">
+                <textarea v-model="loadJson" name="" id="" cols="80" rows="20"></textarea>
+                <div class="actions">
+                    <button @click="loadData">Load Data</button>
+                    <button @click="isImporting = false">Cancel</button>
+                </div>
+            </div>
+
+            <template v-if="!isImporting">
+
+                <!-- Edit Items Modal -->
+                <div class="form-container" v-if="newItem">
+                    <div class="form">
+                        <div class="title">Create Offering Record</div>
+                        <table>
+                            <tr>
+                                <td>Location</td>
+                                <td>
+                                    {{newItem.section}} - {{newItem.row}}{{newItem.column}}
+                                    <!-- <select v-model="newItem.section">
                                 <option disabled value=""></option>
                                 <option>L1</option>
                                 <option>R1</option>
                             </select> -->
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Type</td>
-                            <td>
-                                <select v-model="newItem.type">
-                                    <option disabled value=""></option>
-                                    <option>藥師佛</option>
-                                    <option>黃財神</option>
-                                    <option>黃財神（荷葉）</option>
-                                    <option>財寶天王</option>
-                                    <option>四臂觀音</option>
-                                    <option>文殊菩薩</option>
-                                    <option>長壽佛</option>
-                                    <option>白度母</option>
-                                    <option>綠度母</option>
-                                    <option>蓮花生大士</option>
-                                    <option>阿彌陀佛</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Start Date</td>
-                            <td>
-                                <input v-model="newItem.startDate" type="date" id="startDate">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Expiration Date</td>
-                            <td>
-                                <input v-model="newItem.endDate" type="date" id="endDate">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Name</td>
-                            <td>
-                                <input v-model="newItem.name" type="text" id="name">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Contact Name</td>
-                            <td>
-                                <input v-model="newItem.contactName" type="text" id="contactName">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Phone Number</td>
-                            <td>
-                                <input v-model="newItem.phone" type="text" id="contact">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Price</td>
-                            <td>
-                                <input v-model="newItem.price" type="text" id="price">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Location</td>
-                            <td>
-                                <select v-model="newItem.notAvailable">
-                                    <option value="false">Available</option>
-                                    <option value="true">Not Available</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="actions">
-                        <button type="button" @click="submit">Save Item</button>
-                        <button type="button" @click="clearData">Clear</button>
-                        <button type="button" @click="cancelCreate">Cancel</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Searchbar -->
-            <div class="actions">
-                <div class="action">
-                    Search name: <input type="text" v-model="query"> <button @click="query=''">Clear</button>
-                </div>
-            </div>
-
-            <!-- Search results -->
-            <div class="list" v-if="query">
-                <div v-for="item in allData?.items">
-                    <div class="list-item" @click="selectItem(item.section, item.row, item.column)"
-                        v-if="(item?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item?.contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1)">
-                        {{item.section}}-{{item.row}}{{item.column}} <b>{{item.name}}</b> {{item.contactName}}
-                        {{item.type}}
-                        {{item.startDate}}
-                        {{item.endDate}}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <div v-for="(value, propertyName) in allData.sectionData">
-                <div v-if="propertyName !== 'id'">
-                    <div v-if="allData.sectionData[propertyName]">
-                        <div class="display-options">
-                            <div class="label">Section {{propertyName}}</div>
-                            <div class="table-data">
-                                # Rows &#8615;: <input type="number"
-                                    v-model="allData.sectionData[propertyName].numRows">
-                            </div>
-                            <div class="table-data">
-                                # Columns &#8614;: <input type="number"
-                                    v-model="allData.sectionData[propertyName].numColumns">
-                            </div>
-                            <button @click="saveSectionData">Save</button>
-                        </div>
-                        <div class="section-description" v-if="allData.sectionData[propertyName]">
-                            {{allData.sectionData[propertyName].description}}
-                        </div>
-                    </div>
-                    <div class="display-table" v-if="allData?.sectionData[propertyName]">
-                        <table>
-                            <tr>
-                                <th></th>
-                                <th v-for="indexC in allData.sectionData[propertyName].numColumns">
-                                    {{indexC}}
-                                </th>
+                                </td>
                             </tr>
-                            <tr v-for="indexR in allData?.sectionData[propertyName].numRows" :key="indexR">
-                                <th>
-                                    {{this.alphabetMap[indexR - 1]}}
-                                </th>
-                                <td class="item-container show-on-hover"
-                                    v-for="indexC in allData.sectionData[propertyName].numColumns" :key="indexC"
-                                    @click="selectItem(propertyName, this.alphabetMap[indexR - 1], indexC)">
-                                    <div class="item"
-                                        v-if="!(parsedItemData && parsedItemData[propertyName] && parsedItemData[propertyName][indexR - 1] && parsedItemData[propertyName][indexR - 1][indexC - 1])">
-                                        <div class="location">
-                                            {{this.alphabetMap[indexR - 1]}}{{indexC}}
-                                        </div>
+                            <tr>
+                                <td>Type</td>
+                                <td>
+                                    <select v-model="newItem.type">
+                                        <option disabled value=""></option>
+                                        <option>藥師佛</option>
+                                        <option>黃財神</option>
+                                        <option>黃財神（荷葉）</option>
+                                        <option>財寶天王</option>
+                                        <option>四臂觀音</option>
+                                        <option>文殊菩薩</option>
+                                        <option>長壽佛</option>
+                                        <option>白度母</option>
+                                        <option>綠度母</option>
+                                        <option>蓮花生大士</option>
+                                        <option>阿彌陀佛</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Start Date</td>
+                                <td>
+                                    <input v-model="newItem.startDate" type="date" id="startDate">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Expiration Date</td>
+                                <td>
+                                    <input v-model="newItem.endDate" type="date" id="endDate">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Name</td>
+                                <td>
+                                    <input v-model="newItem.name" type="text" id="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Contact Name</td>
+                                <td>
+                                    <input v-model="newItem.contactName" type="text" id="contactName">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Phone Number</td>
+                                <td>
+                                    <input v-model="newItem.phone" type="text" id="contact">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Price</td>
+                                <td>
+                                    <input v-model="newItem.price" type="text" id="price">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Location</td>
+                                <td>
+                                    <select v-model="newItem.notAvailable">
+                                        <option value="false">Available</option>
+                                        <option value="true">Not Available</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="actions">
+                            <button type="button" @click="submit">Save Item</button>
+                            <button type="button" @click="clearData">Clear</button>
+                            <button type="button" @click="cancelCreate">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Searchbar -->
+                <div class="search-container">
+
+                    <div class="search actions">
+                        <div class="action">
+                            <input type="text" v-model="query" placeholder="Search name"> <button
+                                @click="query=''">Clear</button>
+                        </div>
+                    </div>
+
+                    <!-- Search results -->
+                    <table class="list" v-if="query">
+                        <template v-for="item in allData?.items">
+                            <tr class="list-item" :class="{
+                            active: item.status === 2, 
+                            expired: item.status === -1, 
+                            'week-expired': item.status === 0, 
+                            'month-expired': item.status === 1 }"
+                                @click="selectItem(item.section, item.row, item.column)"
+                                v-if="(item?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item?.contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1)">
+                                <td>{{item.section}}-{{item.row}}{{item.column}}</td>
+                                <td> <b>{{item.name}}</b></td>
+                                <td>({{item.contactName}})</td>
+                                <td>{{item.type}}</td>
+                                <td>
+                                    {{item.startDate}} -
+                                    <span class="list-details">
+                                        {{item.endDate}}
+                                    </span>
+                                </td>
+                            </tr>
+                        </template>
+                    </table>
+                </div>
+
+                <!-- Table -->
+                <div v-for="(value, propertyName) in allData.sectionData">
+                    <div v-if="propertyName !== 'id'">
+                        <div v-if="allData.sectionData[propertyName]">
+                            <div class="display-options">
+                                <div class="label">Section {{propertyName}}</div>
+                                <template v-if="edittingSection === propertyName">
+                                    <div class="table-data">
+                                        # Rows &#8615; <input type="number"
+                                            v-model="allData.sectionData[propertyName].numRows">
                                     </div>
-                                    <div v-else class="item"
-                                        :class="{
+                                    <div class="table-data">
+                                        # Columns &#8614; <input type="number"
+                                            v-model="allData.sectionData[propertyName].numColumns">
+                                    </div>
+                                    <div>
+                                        Description <input type="number"
+                                            v-model="allData.sectionData[propertyName].description">
+                                    </div>
+                                    <button @click="saveSectionData">Save</button>
+                                </template>
+                                <div class="section-description" v-if="edittingSection !== propertyName">
+                                    {{allData.sectionData[propertyName].description}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="display-table" v-if="allData?.sectionData[propertyName]">
+                            <table>
+                                <tr>
+                                    <th></th>
+                                    <th class="column-header"
+                                        v-for="indexC in allData.sectionData[propertyName].numColumns">
+                                        {{indexC}}
+                                    </th>
+                                </tr>
+                                <tr v-for="indexR in allData?.sectionData[propertyName].numRows" :key="indexR">
+                                    <th class="row-header">
+                                        {{this.alphabetMap[indexR - 1]}}
+                                    </th>
+                                    <td class="item-container show-on-hover"
+                                        v-for="indexC in allData.sectionData[propertyName].numColumns" :key="indexC"
+                                        @click="selectItem(propertyName, this.alphabetMap[indexR - 1], indexC)">
+                                        <div class="item"
+                                            v-if="!(parsedItemData && parsedItemData[propertyName] && parsedItemData[propertyName][indexR - 1] && parsedItemData[propertyName][indexR - 1][indexC - 1])">
+                                            <div class="location">
+                                                {{this.alphabetMap[indexR - 1]}}{{indexC}}
+                                            </div>
+                                        </div>
+                                        <div v-else class="item"
+                                            :class="{
                                             'not-available': parsedItemData[propertyName][indexR - 1][indexC - 1].notAvailable,
                                             active: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 2, 
                                             expired: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === -1, 
@@ -186,11 +211,11 @@
                                             'month-expired': (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 1, 
                                             'hidden': query && !((parsedItemData[propertyName][indexR - 1][indexC - 1].name?.toLowerCase().indexOf(query.toLowerCase())  !== -1 || 
                                             parsedItemData[propertyName][indexR - 1][indexC - 1].contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1))}">
-                                        <div class="location">
-                                            {{this.alphabetMap[indexR - 1]}}{{indexC}}
-                                        </div>
-                                        <div class="offering-details">
-                                            <!-- <div>
+                                            <div class="location">
+                                                {{this.alphabetMap[indexR - 1]}}{{indexC}}
+                                            </div>
+                                            <div class="offering-details">
+                                                <!-- <div>
                                                 {{parsedItemData[propertyName][indexR - 1][indexC - 1].name}}
                                             </div>
                                             <div>
@@ -202,42 +227,44 @@
                                             <div>
                                                 {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
                                             </div> -->
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Details Modal -->
-            <div class="details-modal" v-if="selectedItem">
-                <div class="details">
-                    <div class="info-item">
-                        {{selectedItem.section}} - {{selectedItem.row}}{{selectedItem.column}}
-                    </div>
-                    <div class="info-item">
-                        {{selectedItem.name}}
-                        {{selectedItem.contactName}}
-                    </div>
-                    <div class="info-item">
-                        {{selectedStartDate}} -
-                        {{selectedEndDate}}
-                    </div>
-                    <div class="info-item">
-                        {{selectedItem.type}} - ${{selectedItem.price}}
-                    </div>
-                    <div class="info-item">
-                        {{selectedItem.phone}}
-                    </div>
-                    <div class="actions">
-                        <button type="button" @click="selectedItem = null"> Close </button>
-                        <button type="button" @click="editItem()"> Edit
-                        </button>
+                <!-- Details Modal -->
+                <div class="details-modal" v-if="selectedItem">
+                    <div class="details">
+                        <div class="info-item">
+                            {{selectedItem.section}} - {{selectedItem.row}}{{selectedItem.column}}
+                        </div>
+                        <div class="info-item">
+                            {{selectedItem.name}}
+                            {{selectedItem.contactName}}
+                        </div>
+                        <div class="info-item">
+                            {{selectedStartDate}} -
+                            {{selectedEndDate}}
+                        </div>
+                        <div class="info-item">
+                            {{selectedItem.type}} - ${{selectedItem.price}}
+                        </div>
+                        <div class="info-item">
+                            {{selectedItem.phone}}
+                        </div>
+                        <div class="actions">
+                            <button type="button" @click="selectedItem = null"> Close </button>
+                            <button type="button" @click="editItem()"> Edit
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+            </template>
         </div>
     </div>
 
@@ -372,7 +399,8 @@
                     selectedItem: null,
                     parsedItemData: null,
                     filteredList: [],
-                    loadJson: null
+                    loadJson: null,
+                    edittingSection: null
                 }
             },
             computed: {
@@ -407,6 +435,8 @@
                 },
                 saveSectionData() {
                     // Edit existing section data in chart
+                    const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").put(this.allData.sectionData);
+                    this.edittingSection = null;
                 },
                 clearData() {
                     if (this.newItem) {
@@ -482,10 +512,7 @@
                 }
             }
         }).mount('#app');
-
-
     </script>
-
 </body>
 
 </html>
