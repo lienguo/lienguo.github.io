@@ -436,7 +436,7 @@
                     // Edit existing section data in chart
                     let sectionData = this.allData.sectionData;
                     console.log('section', sectionData)
-                    const offeringRequest = this.db.transaction("sectionData", "readwrite").objectStore("sectionData").put({ ...this.allData.sectionData });
+                    this.db.transaction("sectionData", "readwrite").objectStore("sectionData").put({ ...this.allData.sectionData });
                     this.edittingSection = null;
                 },
                 clearData() {
@@ -502,6 +502,11 @@
                     if (this.loadJson) {
                         this.allData = JSON.parse(this.loadJson);
                         this.parsedItemData = parseData(this.allData.items);
+
+                        this.allData.items.forEach(foundItem => {
+                            this.db.transaction("offerings", "readwrite").objectStore("offerings").put({ ...foundItem });
+                        })
+                        this.db.transaction("sectionData", "readwrite").objectStore("sectionData").put({ ...this.allData.sectionData });
                     }
                     this.isImporting = false;
                 },
