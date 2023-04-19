@@ -122,8 +122,8 @@
 
                     <div class="search actions">
                         <div class="action">
-                            <input type="text" v-model="query" placeholder="Search name"> <button
-                                @click="query=''">Clear</button>
+                            <input type="text" v-model="query" placeholder="Search name"> <button class="secondary"
+                                v-if="query" @click="query=''">Clear</button>
                         </div>
                     </div>
 

@@ -90,7 +90,9 @@ input, select {
 }
 
 .list {
-    margin-top: 12px;
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid #D6D6D6;
 }
 
 .list .list-item {
@@ -99,7 +101,7 @@ input, select {
 }
 
 
-.list .list-item:hover{
+.list .list-item:hover {
     background-color: #FFF;
 }
 
