@@ -41,9 +41,11 @@
                             <tr>
                                 <td>Type</td>
                                 <td>
-                                    <select v-model="newItem.type">
+                                    <select v-model="newItem.type" :style="{color: buddahColorMap[newItem.type]}">
                                         <option disabled value=""></option>
-                                        <option>藥師佛</option>
+                                        <option v-for="item in Object.keys(buddahColorMap)"
+                                            :style="{color: buddahColorMap[item]}">{{item}}</option>
+                                        <!-- <option>藥師佛</option>
                                         <option>黃財神</option>
                                         <option>黃財神（荷葉）</option>
                                         <option>財寶天王</option>
@@ -53,7 +55,7 @@
                                         <option>白度母</option>
                                         <option>綠度母</option>
                                         <option>蓮花生大士</option>
-                                        <option>阿彌陀佛</option>
+                                        <option>阿彌陀佛</option> -->
                                     </select>
                                 </td>
                             </tr>
@@ -104,9 +106,13 @@
                             </tr>
                         </table>
                         <div class="actions">
-                            <button type="button" @click="submit">Save Item</button>
-                            <button type="button" @click="clearData">Clear</button>
-                            <button type="button" @click="cancelCreate">Cancel</button>
+                            <div>
+                                <button type="button" class="secondary-solid" @click="clearData">Clear</button>
+                            </div>
+                            <div>
+                                <button type="button" class="secondary" @click="cancelCreate">Cancel</button>
+                                <button type="button" class="primary-solid" @click="submit">Save Item</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -134,7 +140,7 @@
                                 <td>{{item.section}}-{{item.row}}{{item.column}}</td>
                                 <td> <b>{{item.name}}</b></td>
                                 <td>({{item.contactName}})</td>
-                                <td>{{item.type}}</td>
+                                <td :style="{color: buddahColorMap[item.type]}">{{item.type}}</td>
                                 <td>
                                     {{item.startDate}} -
                                     <span class="list-details">
@@ -197,13 +203,16 @@
                                     parsedItemData[propertyName][indexR - 1][indexC - 1].notAvailable}"
                                         v-for="indexC in allData.sectionData[propertyName].numColumns" :key="indexC"
                                         @click="selectItem(propertyName, this.alphabetMap[indexR - 1], indexC)">
-                                        <div class="item"
+                                        <div class="item" :style="{'background-color': parsedItemData && parsedItemData[propertyName] && 
+                                        parsedItemData[propertyName][indexR - 1] && parsedItemData[propertyName][indexR - 1][indexC - 1] &&
+                                        buddahColorMap[parsedItemData[propertyName][indexR - 1][indexC - 1].type]}"
                                             v-if="!(parsedItemData && parsedItemData[propertyName] && parsedItemData[propertyName][indexR - 1] && parsedItemData[propertyName][indexR - 1][indexC - 1])">
                                             <div class="location">
                                                 {{this.alphabetMap[indexR - 1]}}{{indexC}}
                                             </div>
                                         </div>
                                         <div v-else class="item"
+                                            :style="{'background-color': buddahColorMap[parsedItemData[propertyName][indexR - 1][indexC - 1].type]}"
                                             :class="{
                                             active: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 2, 
                                             expired: (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === -1, 
@@ -211,22 +220,11 @@
                                             'month-expired': (parsedItemData[propertyName][indexR - 1][indexC - 1].name || parsedItemData[propertyName][indexR - 1][indexC - 1].contactName) && parsedItemData[propertyName][indexR - 1][indexC - 1].status === 1, 
                                             'hidden': query && !((parsedItemData[propertyName][indexR - 1][indexC - 1].name?.toLowerCase().indexOf(query.toLowerCase())  !== -1 || 
                                             parsedItemData[propertyName][indexR - 1][indexC - 1].contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1))}">
-                                            <div class="location">
+                                            <div class="location"
+                                                :class="{contrast: parsedItemData[propertyName][indexR - 1][indexC - 1].type}">
                                                 {{this.alphabetMap[indexR - 1]}}{{indexC}}
                                             </div>
                                             <div class="offering-details">
-                                                <!-- <div>
-                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].name}}
-                                            </div>
-                                            <div>
-                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
-                                            </div>
-                                            <div>
-                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
-                                            </div>
-                                            <div>
-                                                {{parsedItemData[propertyName][indexR - 1][indexC - 1].type}}
-                                            </div> -->
                                             </div>
                                         </div>
                                     </td>
@@ -399,7 +397,21 @@
                     parsedItemData: null,
                     filteredList: [],
                     loadJson: null,
-                    edittingSection: null
+                    edittingSection: null,
+                    // https://htmlcolorcodes.com/
+                    buddahColorMap: {
+                        '藥師佛': '#e6194b',
+                        '黃財神': '#3cb44b',
+                        '黃財神（荷葉）': '#4363d8',
+                        '財寶天王': '#f58231',
+                        '四臂觀音': '#911eb4',
+                        '文殊菩薩': '#f032e6',
+                        '長壽佛': '#008080',
+                        '白度母': '#9a6324',
+                        '綠度母': '#808000',
+                        '蓮花生大士': '#000075',
+                        '阿彌陀佛': '#808080'
+                    }
                 }
             },
             computed: {
@@ -450,6 +462,7 @@
                     }
 
                     let foundItem = this.allData.items.find(item => item.fullPosition === this.newItem.fullPosition);
+                    console.log('found item', foundItem);
 
                     this.newItem.name = this.newItem.name || this.newItem.contactName;
                     this.newItem.contactName = this.newItem.contactName || this.newItem.name;
@@ -459,6 +472,12 @@
                             foundItem[key] = this.newItem[key];
                         }
                         const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").put({ ...foundItem });
+                        offeringRequest.onsuccess = (event) => {
+                            console.log('successful put', event);
+                        };
+                        offeringRequest.onerror = (event) => {
+                            console.log('error put', event);
+                        };
                     } else {
                         this.allData.items.push(this.newItem);
                         const offeringRequest = this.db.transaction("offerings", "readwrite").objectStore("offerings").add({ ...this.newItem });

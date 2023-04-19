@@ -1,5 +1,6 @@
 :root {
     --main-color: #0075d9;
+    --secondary-color: #DC3545;
 }
 
 
@@ -20,6 +21,23 @@ button {
     height: 30px;
     cursor: pointer;
     font-weight: 500;
+}
+
+button.primary-solid {
+    background: var(--main-color);
+    color: white;
+    border: 2px solid var(--main-color);
+}
+
+button.secondary {
+    border: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+}
+
+button.secondary-solid {
+    background: var(--secondary-color);
+    color: white;
+    border: 2px solid var(--secondary-color);
 }
 
 input, select {
@@ -143,9 +161,15 @@ input, select {
 
 .form .actions {
     margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
 }
 .form .actions button {
     margin-right: 12px;
+}
+
+.form .actions button:last-of-type {
+    margin-right: 0;
 }
 
 .form .actions .action {
@@ -222,9 +246,12 @@ th.row-header {
 .item {
     box-shadow: 0 0 4px 0 #DDD;
     cursor: pointer;
-    padding: 12px 0;
+    padding: 12px 0 6px;
     width: 100%;
     border-radius: 4px;
+    border-bottom-width: 8px;
+    border-bottom-style: solid;
+    border-color: #DADADA;
 }
 
 .item:hover {
@@ -233,6 +260,9 @@ th.row-header {
 
 .item.hidden {
     background-color: white !important;
+}
+.item.hidden .location {   
+    color: #777 !important;
 }
 
 /* .show-on-hover:not(:hover) .location {
@@ -244,6 +274,10 @@ th.row-header {
     font-size: 14px;
 }
 
+.location.contrast {
+    color: white;
+}
+
 .show-on-hover:not(:hover) .offering-details {
     display: none;
 }
@@ -252,20 +286,20 @@ th.row-header {
     white-space: nowrap;
 }
 
-.item-container .active {
-    background-color: #00FF00aa;
+.item-container .item.active {
+    border-color: #00FF00aa;
 }
 
-.item-container .expired {
-    background-color: #ff0000aa;
+.item-container .item.expired {
+    border-color: #ff0000aa;
 }
 
-.item-container .week-expired {
-    background-color: #ff5349aa;
+.item-container .item.week-expired {
+    border-color: #ff5349aa;
 }
 
-.item-container .month-expired {
-    background-color: #ffff00aa;
+.item-container .item.month-expired {
+    border-color: #ffff00aa;
 }
 
 .item-container.not-available {
