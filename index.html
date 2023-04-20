@@ -9,20 +9,20 @@
 <body>
     <div id="app">
         <div class="menu">
-            <div class="app-title">Buddha Offering Management</div>
+            <div class="app-title">蓮果寺佛龕管理系統</div>
             <!-- Export and load data -->
             <div class="load-actions" v-if="!isImporting">
-                <button type="button" @click="exportData">Export Data</button>
-                <button type="button" @click="isImporting = true">Import Data</button>
+                <button type="button" @click="exportData">數據導出</button>
+                <button type="button" @click="isImporting = true">數據導入</button>
             </div>
         </div>
-        <div v-if="isLoadingOffering || isLoadingSection">Loading ...</div>
+        <div v-if="isLoadingOffering || isLoadingSection">加載中...</div>
         <div class="main-container" v-if="!(isLoadingOffering || isLoadingSection)">
             <div v-if="isImporting">
                 <textarea v-model="loadJson" name="" id="" cols="80" rows="20"></textarea>
                 <div class="actions">
-                    <button @click="loadData">Load Data</button>
-                    <button @click="isImporting = false">Cancel</button>
+                    <button @click="loadData">加載數據</button>
+                    <button @click="isImporting = false">取消</button>
                 </div>
             </div>
 
@@ -30,88 +30,77 @@
                 <!-- Edit Items Modal -->
                 <div class="form-container" v-if="newItem">
                     <div class="form">
-                        <div class="title">Create Offering Record</div>
+                        <div class="title">佛龕記錄</div>
                         <table>
                             <tr>
-                                <td>Location</td>
+                                <td>位置</td>
                                 <td>
                                     {{newItem.section}} - {{newItem.row}}{{newItem.column}}
                                 </td>
                             </tr>
                             <tr>
-                                <td>Type</td>
+                                <td>佛像名稱</td>
                                 <td>
                                     <select v-model="newItem.type" :style="{color: buddahColorMap[newItem.type]}">
                                         <option disabled value=""></option>
                                         <option v-for="item in Object.keys(buddahColorMap)"
                                             :style="{color: buddahColorMap[item]}">{{item}}</option>
-                                        <!-- <option>藥師佛</option>
-                                        <option>黃財神</option>
-                                        <option>黃財神（荷葉）</option>
-                                        <option>財寶天王</option>
-                                        <option>四臂觀音</option>
-                                        <option>文殊菩薩</option>
-                                        <option>長壽佛</option>
-                                        <option>白度母</option>
-                                        <option>綠度母</option>
-                                        <option>蓮花生大士</option>
-                                        <option>阿彌陀佛</option> -->
                                     </select>
                                 </td>
                             </tr>
                             <tr>
-                                <td>Start Date</td>
+                                <td>祈安日期</td>
                                 <td>
                                     <input v-model="newItem.startDate" type="date" id="startDate">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Expiration Date</td>
+                                <td>圓滿日期</td>
                                 <td>
                                     <input v-model="newItem.endDate" type="date" id="endDate">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Name</td>
+                                <td>祈安人姓名</td>
                                 <td>
                                     <input v-model="newItem.name" type="text" id="name">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Contact Name</td>
+                                <td>聯係人</td>
                                 <td>
                                     <input v-model="newItem.contactName" type="text" id="contactName">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Phone Number</td>
+                                <td>電話號碼</td>
                                 <td>
                                     <input v-model="newItem.phone" type="text" id="contact">
                                 </td>
                             </tr>
                             <tr>
-                                <td>Price</td>
+                                <td>總計</td>
                                 <td>
                                     <input v-model="newItem.price" type="text" id="price">
                                 </td>
                             </tr>
                             <tr>
-                                <td :class="{danger: newItem.notAvailable}">Location</td>
+                                <td :class="{danger: newItem.notAvailable}">可用狀況</td>
                                 <td>
                                     <select v-model="newItem.notAvailable">
-                                        <option value="">Available</option>
-                                        <option value="true">Not Available</option>
+                                        <option value="">可用</option>
+                                        <option value="true">不可用</option>
                                     </select>
                                 </td>
                             </tr>
                         </table>
                         <div class="actions">
                             <div>
-                                <button type="button" class="secondary-solid" @click="clearData">Clear</button>
+                                <button type="button" class="secondary" @click="clearData">清除</button>
                             </div>
                             <div>
-                                <button type="button" class="secondary" @click="cancelCreate">Cancel</button>
-                                <button type="button" class="primary-solid" @click="submit">Save Item</button>
+                                <button type="button" class="tertiary" @click="cancelCreate">取消</button>
+                                <button type="button" class="primary-solid" @click="submit">保存</button>
                             </div>
                         </div>
                     </div>
@@ -122,8 +111,8 @@
 
                     <div class="search actions">
                         <div class="action">
-                            <input type="text" v-model="query" placeholder="Search name"> <button class="secondary"
-                                v-if="query" @click="query=''">Clear</button>
+                            <input type="text" v-model="query" placeholder="搜索名字"> <button class="secondary"
+                                v-if="query" @click="query=''">清除</button>
                         </div>
                     </div>
 
@@ -153,7 +142,7 @@
                     <div class="list"
                         v-if="query && !allData?.items.find(item => (item?.name?.toLowerCase().indexOf(query.toLowerCase()) !== -1 || item?.contactName?.toLowerCase().indexOf(query.toLowerCase()) !== -1))">
                         <i>
-                            No results found
+                            抱歉，沒有您要的結果
                         </i>
                     </div>
                 </div>
@@ -163,25 +152,24 @@
                     <div v-if="propertyName !== 'id'">
                         <div v-if="allData.sectionData[propertyName]">
                             <div class="display-options">
-                                <div class="label">Section {{propertyName}}</div>
+                                <div class="label">佛龕位置 {{propertyName}}</div>
                                 <template v-if="edittingSection === propertyName">
                                     <div class="table-data">
-                                        # Rows &#8615; <input type="number"
+                                        # 行 &#8615; <input type="number"
                                             v-model="allData.sectionData[propertyName].numRows">
                                     </div>
                                     <div class="table-data">
-                                        # Columns &#8614; <input type="number"
+                                        # 列 &#8614; <input type="number"
                                             v-model="allData.sectionData[propertyName].numColumns">
                                     </div>
                                     <div class="table-long-data">
-                                        Description <input type="text"
-                                            v-model="allData.sectionData[propertyName].description">
+                                        詳情 <input type="text" v-model="allData.sectionData[propertyName].description">
                                     </div>
-                                    <button @click="saveSectionData">Save</button>
+                                    <button @click="saveSectionData">保存</button>
                                 </template>
                                 <div class="section-description" v-if="edittingSection !== propertyName">
                                     {{allData.sectionData[propertyName].description}}
-                                    <span class="edit" @click="edittingSection = propertyName">Edit</span>
+                                    <span class="edit" @click="edittingSection = propertyName">修改</span>
                                 </div>
                             </div>
                         </div>
@@ -235,7 +223,7 @@
                 </div>
 
                 <!-- Details Modal -->
-                <div class="details-modal" v-if="selectedItem">
+                <!-- <div class="details-modal" v-if="selectedItem">
                     <div class="details">
                         <div class="info-item">
                             {{selectedItem.section}} - {{selectedItem.row}}{{selectedItem.column}}
@@ -260,7 +248,7 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
             </template>
         </div>
@@ -287,9 +275,11 @@
                 let timeDifference = (new Date(item.endDate).getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000);
                 if (timeDifference < 0) {
                     item.status = -1;
-                } else if (timeDifference < 7) {
-                    item.status = 0;
-                } else if (timeDifference < 30) {
+                }
+                // else if (timeDifference < 7) {
+                //     item.status = 0;
+                // } 
+                else if (timeDifference < 30) {
                     item.status = 1;
                 } else {
                     item.status = 2;
@@ -400,17 +390,17 @@
                     edittingSection: null,
                     // https://htmlcolorcodes.com/
                     buddahColorMap: {
-                        '藥師佛': '#e6194b',
-                        '黃財神': '#3cb44b',
-                        '黃財神（荷葉）': '#4363d8',
-                        '財寶天王': '#f58231',
-                        '四臂觀音': '#911eb4',
-                        '文殊菩薩': '#f032e6',
-                        '長壽佛': '#008080',
-                        '白度母': '#9a6324',
-                        '綠度母': '#808000',
-                        '蓮花生大士': '#000075',
-                        '阿彌陀佛': '#808080'
+                        '藥師佛': '#1F52E2',
+                        '黃財神': '#278BDD',
+                        '黃財神（荷葉）': '#CC802B',
+                        '財寶天王': '#676460',
+                        '四臂觀音': '#D8371C',
+                        '文殊菩薩': '#A1D81C',
+                        '長壽佛': '#525F6A',
+                        '白度母': '#581845',
+                        '綠度母': '#386F0D',
+                        '蓮花生大士': '#8F17B4',
+                        '阿彌陀佛': '#2F2E2F'
                     }
                 }
             },
@@ -514,7 +504,7 @@
                     var a = document.createElement("a");
                     var file = new Blob([JSON.stringify(this.allData)], { type: 'application/json' });
                     a.href = URL.createObjectURL(file);
-                    a.download = 'data';
+                    a.download = new Date().toLocaleDateString();
                     a.click();
                 },
                 loadData() {
