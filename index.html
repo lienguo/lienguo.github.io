@@ -117,7 +117,7 @@
                     </div>
 
                     <!-- Search results -->
-                    <table class="list" v-if="query">
+                    <table class="list bordered" v-if="query">
                         <template v-for="item in allData?.items">
                             <tr class="list-item" :class="{
                             active: item.status === 2, 
@@ -131,7 +131,7 @@
                                 <td>({{item.contactName}})</td>
                                 <td :style="{color: buddahColorMap[item.type]}">{{item.type}}</td>
                                 <td>
-                                    {{item.startDate}} -
+                                    {{item.startDate}} &nbsp;-&nbsp;
                                     <span class="list-details">
                                         {{item.endDate}}
                                     </span>
@@ -274,7 +274,7 @@
                                     <td v-if="item.contactName">({{item.contactName}})</td>
                                     <td :style="{color: buddahColorMap[item.type]}">{{item.type}}</td>
                                     <td v-if="item.name">
-                                        {{item.startDate}} -
+                                        {{item.startDate}} &nbsp;-&nbsp;
                                         <span class="list-details">
                                             {{item.endDate}}
                                         </span>
