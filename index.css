@@ -2,6 +2,12 @@
     --main-color: #0075d9;
     --secondary-color: #DC3545;
     --tertiary-color: #666666;
+
+
+    --active-color: #01BF36;
+    --week-warning-color: #FFCA00;
+    --warning-color:#FFCA00;
+    --expired-color: #ff0000;
 }
 
 
@@ -116,16 +122,16 @@ input, select {
 }
 
 .list .list-item.active .list-details {
-    color: #00FF00aa;
+    color: var(--active-color);
 }
 .list .list-item.expired .list-details {
-    color: #ff0000aa;
+    color: var(--expired-color);
 }
 .list .list-item.week-expired .list-details {
-    color: #ff5349aa;
+    color: var(--week-warning-color);
 }
 .list .list-item.month-expired .list-details {
-    color: #ffff00aa;
+    color: var(--warning-color);
 }
 
 .form-container {
@@ -294,19 +300,20 @@ th.row-header {
 }
 
 .item-container .item.active {
-    border-color: #00FF00aa;
+    border-color: var(--active-color);
 }
 
 .item-container .item.expired {
-    border-color: #ff0000aa;
+    border-color: var(--expired-color);
 }
 
 .item-container .item.week-expired {
-    border-color: #ff5349aa;
+    /* border-color: #ff5349; */
+    border-color: var(--week-warning-color);
 }
 
 .item-container .item.month-expired {
-    border-color: #ffff00aa;
+    border-color: var(--warning-color);
 }
 
 .item-container.not-available {
@@ -336,4 +343,47 @@ th.row-header {
 
 .details .info-item {
     margin-bottom: 8px;
+}
+
+.stats-table-container {
+    display: flex;
+}
+
+.stats-table {
+    border-collapse: collapse;
+    margin-right: 16px;
+}
+
+.stats-table th {
+    text-align: center;
+    padding: 2px 8px;
+}
+
+.stats-table .clickable {
+    cursor: pointer;
+}
+
+.stats-table td {
+    text-align: left;
+    padding: 2px 8px;
+}
+
+.stats-table td.total {
+    text-align: center
+}
+
+.stats-table tr:nth-child(odd) {
+    background-color: #eee;
+  }
+
+.stats-table .active {
+    color: var(--active-color);
+}
+
+.stats-table .expired {
+    color: var(--expired-color);
+}
+
+.stats-table .warning {
+    color: var(--warning-color);
 }

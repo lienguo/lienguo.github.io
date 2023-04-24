@@ -147,7 +147,7 @@
                     </div>
                 </div>
 
-                <!-- Table -->
+                <!-- Main Table -->
                 <div v-for="(value, propertyName) in allData.sectionData">
                     <div v-if="propertyName !== 'id'">
                         <div v-if="allData.sectionData[propertyName]">
@@ -222,6 +222,69 @@
                     </div>
                 </div>
 
+                <!-- Stats Table -->
+                <div class="stats-table-container">
+                    <div class="stats-table">
+                        <table>
+                            <tr>
+                                <td></td>
+                                <td>空的</td>
+                                <td>正在使用</td>
+                                <td>快過期</td>
+                                <td>已到期</td>
+                                <td>總計的</td>
+                            </tr>
+                            <tr v-for="item in Object.keys(buddahColorMap)">
+                                <td :style="{color: buddahColorMap[item]}">
+                                    {{item}}
+                                </td>
+                                <th @click="selectedStatMapList = statMap[item][-2]"
+                                    :class="{clickable: statMap[item][-2] && statMap[item][-2].length}">
+                                    {{statMap[item][-2] && statMap[item][-2].length || 0}}
+                                </th>
+                                <th @click="selectedStatMapList = statMap[item][2]" class="active"
+                                    :class="{clickable: statMap[item][2] && statMap[item][2].length}">
+                                    {{statMap[item][2] && statMap[item][2].length || 0}}
+                                </th>
+                                <th @click="selectedStatMapList = statMap[item][1]" class="warning"
+                                    :class="{clickable: statMap[item][1] && statMap[item][1].length}">
+                                    {{statMap[item][1] && statMap[item][1].length || 0}}
+                                </th>
+                                <th @click="selectedStatMapList = statMap[item][-1]" class="expired"
+                                    :class="{clickable: statMap[item][-1] && statMap[item][-1].length}">
+                                    {{statMap[item][-1] && statMap[item][-1].length || 0}}
+                                </th>
+                                <td class="total">
+                                    {{statMap[item].total}}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="stats-table-list">
+                        <table class="list" v-if="selectedStatMapList">
+                            <template v-for="item in selectedStatMapList">
+                                <tr class="list-item" :class="{
+                                active: item.status === 2, 
+                                expired: item.status === -1, 
+                                'week-expired': item.status === 0, 
+                                'month-expired': item.status === 1 }"
+                                    @click="selectItem(item.section, item.row, item.column)">
+                                    <td>{{item.section}}-{{item.row}}{{item.column}}</td>
+                                    <td v-if="item.name"> <b>{{item.name}}</b></td>
+                                    <td v-if="item.contactName">({{item.contactName}})</td>
+                                    <td :style="{color: buddahColorMap[item.type]}">{{item.type}}</td>
+                                    <td v-if="item.name">
+                                        {{item.startDate}} -
+                                        <span class="list-details">
+                                            {{item.endDate}}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Details Modal -->
                 <!-- <div class="details-modal" v-if="selectedItem">
                     <div class="details">
@@ -272,17 +335,23 @@
                 parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())] = parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())] || [];
                 parsedItemData[item.section][alphabetMap.indexOf(item.row.toUpperCase())][item.column - 1] = item;
 
-                let timeDifference = (new Date(item.endDate).getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000);
-                if (timeDifference < 0) {
-                    item.status = -1;
-                }
-                // else if (timeDifference < 7) {
-                //     item.status = 0;
-                // } 
-                else if (timeDifference < 30) {
-                    item.status = 1;
+                if (item.name) {
+                    console.log('item name', item.name)
+                    let timeDifference = (new Date(item.endDate).getTime() - new Date().getTime()) / (24 * 60 * 60 * 1000);
+                    if (timeDifference < 0) {
+                        item.status = -1;
+                    }
+                    // else if (timeDifference <= 7) {
+                    //     item.status = 0;
+                    // } 
+                    else if (timeDifference <= 30) {
+                        item.status = 1;
+                    } else {
+                        item.status = 2;
+                    }
                 } else {
-                    item.status = 2;
+                    item.status = -2;
+                    console.log('item name', item.name)
                 }
             })
             return parsedItemData;
@@ -353,6 +422,7 @@
                                 console.log(21, 'offering data found in db');
                                 this.allData.items = offeringRequest.result;
                                 this.parsedItemData = parseData(this.allData.items);
+                                this.updateStatMap();
 
                                 console.log(this.allData);
                             } else {
@@ -388,7 +458,12 @@
                     filteredList: [],
                     loadJson: null,
                     edittingSection: null,
-                    // https://htmlcolorcodes.com/
+                    statMap: {
+                        // [buddaType]: {
+                        //     [status]: [count]
+                        // }
+                    },
+                    selectedStatMapList: null,
                     buddahColorMap: {
                         '藥師佛': '#1F52E2',
                         '黃財神': '#278BDD',
@@ -417,6 +492,26 @@
                 }
             },
             methods: {
+                updateStatMap() {
+                    this.selectedStatMapList = null;
+                    this.allData.items.forEach(item => {
+                        if (!item.type) {
+                            return;
+                        }
+                        this.statMap[item.type] = this.statMap[item.type] || {
+                            total: 0
+                        };
+                        this.statMap[item.type].total++;
+
+                        if (this.statMap[item.type][item.status]) {
+                            this.statMap[item.type][item.status].push(item);
+                        } else {
+                            this.statMap[item.type][item.status] = [item];
+                        }
+                    })
+
+                    console.log('Stat map', JSON.parse(JSON.stringify(this.statMap)))
+                },
                 createNewItem(section, row, column, type = '') {
                     return {
                         fullPosition: section + '-' + row + '-' + column,
@@ -437,7 +532,6 @@
                 saveSectionData() {
                     // Edit existing section data in chart
                     let sectionData = this.allData.sectionData;
-                    console.log('section', sectionData)
                     this.db.transaction("sectionData", "readwrite").objectStore("sectionData").put({ ...this.allData.sectionData });
                     this.edittingSection = null;
                 },
@@ -452,7 +546,6 @@
                     }
 
                     let foundItem = this.allData.items.find(item => item.fullPosition === this.newItem.fullPosition);
-                    console.log('found item', foundItem);
 
                     this.newItem.name = this.newItem.name || this.newItem.contactName;
                     this.newItem.contactName = this.newItem.contactName || this.newItem.name;
@@ -476,6 +569,7 @@
                     this.newItem = null;
 
                     this.parsedItemData = parseData(this.allData.items);
+                    this.updateStatMap();
                     if (vm) {
                         vm.$forceUpdate();
                     }
@@ -511,6 +605,7 @@
                     if (this.loadJson) {
                         this.allData = JSON.parse(this.loadJson);
                         this.parsedItemData = parseData(this.allData.items);
+                        this.updateStatMap();
 
                         this.allData.items.forEach(foundItem => {
                             this.db.transaction("offerings", "readwrite").objectStore("offerings").put({ ...foundItem });
