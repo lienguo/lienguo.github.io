@@ -350,6 +350,7 @@ th.row-header {
 
 .stats-table-container {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .stats-table {
