@@ -240,22 +240,22 @@
                                 </td>
                                 <th @click="selectedStatMapList = statMap[item][-2]"
                                     :class="{clickable: statMap[item][-2] && statMap[item][-2].length}">
-                                    {{statMap[item][-2] && statMap[item][-2].length || 0}}
+                                    {{statMap[item] && statMap[item][-2] && statMap[item][-2].length || 0}}
                                 </th>
                                 <th @click="selectedStatMapList = statMap[item][2]" class="active"
                                     :class="{clickable: statMap[item][2] && statMap[item][2].length}">
-                                    {{statMap[item][2] && statMap[item][2].length || 0}}
+                                    {{statMap[item] && statMap[item][2] && statMap[item][2].length || 0}}
                                 </th>
                                 <th @click="selectedStatMapList = statMap[item][1]" class="warning"
                                     :class="{clickable: statMap[item][1] && statMap[item][1].length}">
-                                    {{statMap[item][1] && statMap[item][1].length || 0}}
+                                    {{statMap[item] && statMap[item][1] && statMap[item][1].length || 0}}
                                 </th>
                                 <th @click="selectedStatMapList = statMap[item][-1]" class="expired"
                                     :class="{clickable: statMap[item][-1] && statMap[item][-1].length}">
-                                    {{statMap[item][-1] && statMap[item][-1].length || 0}}
+                                    {{statMap[item] && statMap[item][-1] && statMap[item][-1].length || 0}}
                                 </th>
                                 <td class="total">
-                                    {{statMap[item].total}}
+                                    {{statMap[item] && statMap[item].total}}
                                 </td>
                             </tr>
                         </table>
